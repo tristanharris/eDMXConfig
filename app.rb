@@ -9,8 +9,21 @@ TkRoot.new do |p|
       text 'eDMX devices'
       borderwidth 1
       pack('side' => 'left', fill: 'both', expand: true)
-      TkListbox.new(p) do
-        pack(fill: 'both', expand: true)
+      TkFrame.new(p) do |p|
+        pack('side' => 'top', fill: 'both', expand: true)
+        devices = TkListbox.new(p) do
+          pack(side: 'left', fill: 'both', expand: true)
+          insert 0, *["yellow", "gray", "green"]*10
+        end
+        TkScrollbar.new(p) do |scroll|
+          pack(side: 'right', fill: 'y')
+          command do |*idx|
+            devices.yview(*idx)
+          end
+          devices.yscroll proc { |*idx|
+            set(*idx)
+          }
+        end
       end
       TkButton.new(p) do
         text 'Search For Device'
@@ -93,7 +106,7 @@ TkRoot.new do |p|
     borderwidth 1
     pack('side' => 'bottom', fill: 'both', expand: true)
     msgs = Tk::Tile::Treeview.new(p) do |p|
-      pack(fill: 'both', expand: true)
+      pack(side: 'left', fill: 'y', expand: true)
       p['columns'] = 'type source message'
       p.heading_configure('#0', text: 'Time')
       p.heading_configure(:type, text: 'Type')
@@ -111,6 +124,15 @@ TkRoot.new do |p|
       p.insert(nil, :end, text: 1, values: [2,3,4])
       p.insert(nil, :end, text: 1, values: [2,3,4])
       p.insert(nil, :end, text: 1, values: [2,3,4])
+    end
+    TkScrollbar.new(p) do |scroll|
+      pack(side: 'right', fill: 'y')
+      command do |*idx|
+        msgs.yview(*idx)
+      end
+      msgs.yscroll proc { |*idx|
+        set(*idx)
+      }
     end
   end
 end
