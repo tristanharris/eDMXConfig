@@ -62,11 +62,51 @@ TkRoot.new do |p|
           text 'Network Settings'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
+          TkLabel.new(p) do
+            text 'Ip Address'
+            pack('side' => 'top', fill: 'both', expand: true)
+          end
+          TkLabel.new(p) do
+            text 'Subnet Mask'
+            pack('side' => 'top', fill: 'both', expand: true)
+          end
+          TkLabel.new(p) do
+            text 'Default Gateway'
+            pack('side' => 'top', fill: 'both', expand: true)
+          end
         end
         TkLabelFrame.new(p) do |p|
           text 'Network Mode'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
+          TkRadioButton.new(p) do
+            text '2.X.Y.Z'
+            variable $v
+            value '2.X.Y.Z'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+          end
+          TkRadioButton.new(p) do
+            text '10.X.Y.Z'
+            variable $v
+            value '10.X.Y.Z'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+          end
+          TkRadioButton.new(p) do
+            text 'Custom IP'
+            variable $v
+            value 'custom'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+          end
+          TkRadioButton.new(p) do
+            text 'DHCP'
+            variable $v
+            value 'dhcp'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+          end
         end
       end
       TkFrame.new(p) do |p|
@@ -80,6 +120,14 @@ TkRoot.new do |p|
           text 'Commands'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
+          TkButton.new(p) do
+            text 'Update Network Settings'
+            pack(fill: 'both', expand: true)
+          end
+          TkButton.new(p) do
+            text 'Firmware Update'
+            pack(fill: 'both', expand: true)
+          end
         end
       end
       TkFrame.new(p) do |p|
