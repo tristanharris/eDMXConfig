@@ -17,10 +17,9 @@ TkRoot.new do |p|
         pack('side' => 'top', fill: 'both', expand: true)
         gui.devices = Tk::Tile::Treeview.new(p) do |p|
           p['columns'] = 'name'
-          p.heading_configure('#0', text: 'IP')
+          p.heading_configure('#0', text: 'IP Address')
           p.heading_configure(:name, text: 'Name')
           pack(side: 'left', fill: 'both', expand: true)
-          #insert 0, *["yellow", "gray", "green"]*10
         end
         TkScrollbar.new(p) do |scroll|
           pack(side: 'right', fill: 'y')
@@ -160,32 +159,20 @@ TkRoot.new do |p|
     text 'Messages'
     borderwidth 1
     pack('side' => 'bottom', fill: 'both', expand: true)
-    msgs = Tk::Tile::Treeview.new(p) do |p|
+    gui.msgs = Tk::Tile::Treeview.new(p) do |p|
       pack(side: 'left', fill: 'y', expand: true)
       p['columns'] = 'type source message'
       p.heading_configure('#0', text: 'Time')
       p.heading_configure(:type, text: 'Type')
       p.heading_configure(:source, text: 'Source')
       p.heading_configure(:message, text: 'ArtNet Message')
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
-      p.insert(nil, :end, text: 1, values: [2,3,4])
     end
     TkScrollbar.new(p) do |scroll|
       pack(side: 'right', fill: 'y')
       command do |*idx|
-        msgs.yview(*idx)
+        gui.msgs.yview(*idx)
       end
-      msgs.yscroll proc { |*idx|
+      gui.msgs.yscroll proc { |*idx|
         set(*idx)
       }
     end
@@ -197,8 +184,13 @@ end
 artnet.on :node_update do |nodes|
   gui.devices.children('').each {|c| gui.devices.delete c }
   nodes.each do |node|
-    puts node.ip
     gui.devices.insert nil, :end, text: node.ip, values: [node.shortname]
+  end
+end
+artnet.on :message do |packet|
+  if !(ArtNet::Packet::DMX === packet)
+    type = (packet.sender_ip == artnet.local_ip ? 'Transmitted' : 'Received')
+    gui.msgs.insert nil, :end, text: packet.received_at, values: [type, packet.sender_name, packet.type]
   end
 end
 artnet.poll_nodes
