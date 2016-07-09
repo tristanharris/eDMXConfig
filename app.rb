@@ -19,6 +19,7 @@ TkRoot.new do |p|
           p['columns'] = 'name'
           p.heading_configure('#0', text: 'IP Address')
           p.heading_configure(:name, text: 'Name')
+          selectmode :browse
           pack(side: 'left', fill: 'both', expand: true)
         end
         TkScrollbar.new(p) do |scroll|
@@ -47,7 +48,7 @@ TkRoot.new do |p|
           text 'MAC Address'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
-          mac = TkLabel.new(p) do
+          gui.mac = TkLabel.new(p) do
             text 'hello'
             pack('side' => 'left', fill: 'both', expand: true)
           end
@@ -56,7 +57,7 @@ TkRoot.new do |p|
           text 'Device IP Address'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
-          ip = TkLabel.new(p) do
+          gui.ip = TkLabel.new(p) do
             text 'hello'
             pack('side' => 'left', fill: 'both', expand: true)
           end
@@ -178,13 +179,19 @@ TkRoot.new do |p|
     end
   end
 end
+gui.devices.bind('<TreeviewSelect>') do |e|
+  ip = e.widget.selection.first.id
+  node = artnet.node(ip)
+  gui.ip.text = node.ip
+  gui.mac.text = node.mac
+end
 gui.thread = Thread.new do
   Tk.mainloop
 end
 artnet.on :node_update do |nodes|
   gui.devices.children('').each {|c| gui.devices.delete c }
   nodes.each do |node|
-    gui.devices.insert nil, :end, text: node.ip, values: [node.shortname]
+    gui.devices.insert nil, :end, text: node.ip, values: [node.shortname], id: node.ip
   end
 end
 artnet.on :message do |packet|
