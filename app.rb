@@ -59,171 +59,173 @@ gui.root = TkRoot.new do |p|
       end
     end
 
-    TkLabelFrame.new(p) do |p|
-      text 'Network'
-      borderwidth 1
+    gui.tabs = Tk::Tile::Notebook.new(p) do |p|
       pack('side' => 'left', fill: 'both', expand: true)
-      TkFrame.new(p) do |p|
-        pack('side' => 'top', fill: 'both', expand: true)
-        TkLabelFrame.new(p) do |p|
-          text 'MAC Address'
-          borderwidth 1
+      network = TkFrame.new(p) do |p|
           pack('side' => 'left', fill: 'both', expand: true)
-          gui.mac = TkLabel.new(p) do
-            pack('side' => 'left', fill: 'both', expand: true)
-          end
-        end
-        TkLabelFrame.new(p) do |p|
-          text 'Device IP Address'
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
-          gui.ip = TkLabel.new(p) do
-            pack('side' => 'left', fill: 'both', expand: true)
-          end
-        end
-      end
-      TkFrame.new(p) do |p|
-        pack('side' => 'top', fill: 'both', expand: true)
-        TkLabelFrame.new(p) do |p|
-          text 'Network Settings'
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
-          TkFrame.new(p) do |p|
-            pack('side' => 'top', fill: 'both', expand: true)
-            TkLabel.new(p) do
-              text 'Ip Address'
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-            gui.setting_items << Tk::Tile::Entry.new(p) do
-              textvariable gui.new_ip = TkVariable.new
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-          end
-          TkFrame.new(p) do |p|
-            pack('side' => 'top', fill: 'both', expand: true)
-            TkLabel.new(p) do
-              text 'Subnet Mask'
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-            gui.setting_items << Tk::Tile::Entry.new(p) do
-              textvariable gui.new_netmask = TkVariable.new
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-          end
-          TkFrame.new(p) do |p|
-            pack('side' => 'top', fill: 'both', expand: true)
-            TkLabel.new(p) do
-              text 'Default Gateway'
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-            gui.setting_items << Tk::Tile::Entry.new(p) do
-              textvariable gui.new_gateway = TkVariable.new
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-          end
-        end
-        TkLabelFrame.new(p) do |p|
-          text 'Network Mode'
-          gui.net_mode = TkVariable.new
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
-          gui.setting_items << TkRadioButton.new(p) do
-            text '2.X.Y.Z'
-            variable gui.net_mode
-            value '1'
-            anchor 'w'
-            pack('side' => 'top', 'fill' => 'x')
-          end
-          gui.setting_items << TkRadioButton.new(p) do
-            text '10.X.Y.Z'
-            variable gui.net_mode
-            value '2'
-            anchor 'w'
-            pack('side' => 'top', 'fill' => 'x')
-          end
-          gui.setting_items << TkRadioButton.new(p) do
-            text 'Custom IP'
-            variable gui.net_mode
-            value '0'
-            anchor 'w'
-            pack('side' => 'top', 'fill' => 'x')
-          end
-          gui.setting_items << TkRadioButton.new(p) do
-            text 'DHCP'
-            variable gui.net_mode
-            value 'dhcp'
-            anchor 'w'
-            pack('side' => 'top', 'fill' => 'x')
-          end
-        end
-      end
-      TkFrame.new(p) do |p|
-        pack('side' => 'top', fill: 'both', expand: true)
-        TkLabelFrame.new(p) do |p|
-          text 'Hardware Information'
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
+        TkFrame.new(p) do |p|
+          pack('side' => 'top', fill: 'both', expand: true)
           TkLabelFrame.new(p) do |p|
-            borderwidth 0
-            pack('side' => 'top', fill: 'both', expand: true)
-            TkLabel.new(p) do
-              text 'Firmware Version'
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-            gui.firmware = TkLabel.new(p) do
+            text 'MAC Address'
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+            gui.mac = TkLabel.new(p) do
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
           TkLabelFrame.new(p) do |p|
-            borderwidth 0
-            pack('side' => 'top', fill: 'both', expand: true)
-            TkLabel.new(p) do
-              text 'Device'
-              pack('side' => 'left', fill: 'both', expand: true)
-            end
-            gui.device_name = TkLabel.new(p) do
+            text 'Device IP Address'
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+            gui.ip = TkLabel.new(p) do
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
-          gui.name = TkLabel.new(p) do
-            wraplength 200
+        end
+        TkFrame.new(p) do |p|
+          pack('side' => 'top', fill: 'both', expand: true)
+          TkLabelFrame.new(p) do |p|
+            text 'Network Settings'
+            borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
+            TkFrame.new(p) do |p|
+              pack('side' => 'top', fill: 'both', expand: true)
+              TkLabel.new(p) do
+                text 'Ip Address'
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+              gui.setting_items << Tk::Tile::Entry.new(p) do
+                textvariable gui.new_ip = TkVariable.new
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+            end
+            TkFrame.new(p) do |p|
+              pack('side' => 'top', fill: 'both', expand: true)
+              TkLabel.new(p) do
+                text 'Subnet Mask'
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+              gui.setting_items << Tk::Tile::Entry.new(p) do
+                textvariable gui.new_netmask = TkVariable.new
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+            end
+            TkFrame.new(p) do |p|
+              pack('side' => 'top', fill: 'both', expand: true)
+              TkLabel.new(p) do
+                text 'Default Gateway'
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+              gui.setting_items << Tk::Tile::Entry.new(p) do
+                textvariable gui.new_gateway = TkVariable.new
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+            end
+          end
+          TkLabelFrame.new(p) do |p|
+            text 'Network Mode'
+            gui.net_mode = TkVariable.new
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+            gui.setting_items << TkRadioButton.new(p) do
+              text '2.X.Y.Z'
+              variable gui.net_mode
+              value '1'
+              anchor 'w'
+              pack('side' => 'top', 'fill' => 'x')
+            end
+            gui.setting_items << TkRadioButton.new(p) do
+              text '10.X.Y.Z'
+              variable gui.net_mode
+              value '2'
+              anchor 'w'
+              pack('side' => 'top', 'fill' => 'x')
+            end
+            gui.setting_items << TkRadioButton.new(p) do
+              text 'Custom IP'
+              variable gui.net_mode
+              value '0'
+              anchor 'w'
+              pack('side' => 'top', 'fill' => 'x')
+            end
+            gui.setting_items << TkRadioButton.new(p) do
+              text 'DHCP'
+              variable gui.net_mode
+              value 'dhcp'
+              anchor 'w'
+              pack('side' => 'top', 'fill' => 'x')
+            end
           end
         end
-        TkLabelFrame.new(p) do |p|
-          text 'Commands'
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
-          gui.setting_items << TkButton.new(p) do
-            text 'Update Network Settings'
-            command proc {
-              gui.artnet.transmit Settings.new, gui.node
-            }
-            pack(fill: 'both', expand: true)
+        TkFrame.new(p) do |p|
+          pack('side' => 'top', fill: 'both', expand: true)
+          TkLabelFrame.new(p) do |p|
+            text 'Hardware Information'
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+            TkLabelFrame.new(p) do |p|
+              borderwidth 0
+              pack('side' => 'top', fill: 'both', expand: true)
+              TkLabel.new(p) do
+                text 'Firmware Version'
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+              gui.firmware = TkLabel.new(p) do
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+            end
+            TkLabelFrame.new(p) do |p|
+              borderwidth 0
+              pack('side' => 'top', fill: 'both', expand: true)
+              TkLabel.new(p) do
+                text 'Device'
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+              gui.device_name = TkLabel.new(p) do
+                pack('side' => 'left', fill: 'both', expand: true)
+              end
+            end
+            gui.name = TkLabel.new(p) do
+              wraplength 200
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
           end
-          gui.setting_items << TkButton.new(p) do
-            text 'Firmware Update'
-            pack(fill: 'both', expand: true)
+          TkLabelFrame.new(p) do |p|
+            text 'Commands'
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+            gui.setting_items << TkButton.new(p) do
+              text 'Update Network Settings'
+              command proc {
+                gui.artnet.transmit Settings.new, gui.node
+              }
+              pack(fill: 'both', expand: true)
+            end
+            gui.setting_items << TkButton.new(p) do
+              text 'Firmware Update'
+              pack(fill: 'both', expand: true)
+            end
+          end
+        end
+        TkFrame.new(p) do |p|
+          pack('side' => 'top', fill: 'both', expand: true)
+          TkLabelFrame.new(p) do |p|
+            text 'Network Adapter IP Address'
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+          end
+          TkLabelFrame.new(p) do |p|
+            text 'Network Adapter Subnet Mask'
+            borderwidth 1
+            pack('side' => 'left', fill: 'both', expand: true)
+            adapter_mask = TkLabel.new(p) do
+              text 'hello'
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
           end
         end
       end
-      TkFrame.new(p) do |p|
-        pack('side' => 'top', fill: 'both', expand: true)
-        TkLabelFrame.new(p) do |p|
-          text 'Network Adapter IP Address'
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
-        end
-        TkLabelFrame.new(p) do |p|
-          text 'Network Adapter Subnet Mask'
-          borderwidth 1
-          pack('side' => 'left', fill: 'both', expand: true)
-          adapter_mask = TkLabel.new(p) do
-            text 'hello'
-            pack('side' => 'left', fill: 'both', expand: true)
-          end
-        end
-      end
+      p.add network, text: 'Network'
     end
   end
   TkLabelFrame.new(p) do |p|
@@ -339,6 +341,12 @@ artnet.on :message do |packet|
       gui.new_netmask.value = packet.netmask
       gui.new_gateway.value = packet.gateway
       gui.net_mode.value = packet.netmode
+      (gui.tabs.tabs.count - 1).times do
+        gui.tabs.forget(1)
+      end
+      packet.ports.each_with_index do |port, i|
+        gui.tabs.add TkFrame.new, text: 'Port ' + (i+65).chr
+      end
       gui.setting_items.each do |item|
         item.state :normal
       end
