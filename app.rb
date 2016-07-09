@@ -1,6 +1,10 @@
 require 'tk'
 require 'art_net'
 require 'ostruct'
+require_relative 'settings'
+
+ArtNet::Packet.register(0xf8f0, Settings)
+ArtNet::Packet.register(0xf9f0, SettingsReply)
 
 TkOption.add '*tearOff', 0
 
@@ -126,21 +130,21 @@ gui.root = TkRoot.new do |p|
           gui.setting_items << TkRadioButton.new(p) do
             text '2.X.Y.Z'
             variable gui.net_mode
-            value '2.X.Y.Z'
+            value '1'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
           gui.setting_items << TkRadioButton.new(p) do
             text '10.X.Y.Z'
             variable gui.net_mode
-            value '10.X.Y.Z'
+            value '2'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
           gui.setting_items << TkRadioButton.new(p) do
             text 'Custom IP'
             variable gui.net_mode
-            value 'custom'
+            value '0'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
@@ -192,6 +196,9 @@ gui.root = TkRoot.new do |p|
           pack('side' => 'left', fill: 'both', expand: true)
           gui.setting_items << TkButton.new(p) do
             text 'Update Network Settings'
+            command proc {
+              gui.artnet.transmit Settings.new, gui.node
+            }
             pack(fill: 'both', expand: true)
           end
           gui.setting_items << TkButton.new(p) do
@@ -302,6 +309,7 @@ gui.devices.bind('<TreeviewSelect>') do |e|
   ip = e.widget.selection.first.id
   node = artnet.node(ip)
   gui.node = node
+  artnet.transmit Settings.new, node
   gui.ip.text = node.ip
   gui.mac.text = node.mac
   gui.name.text = node.longname
@@ -326,6 +334,15 @@ artnet.on :message do |packet|
   if !(ArtNet::Packet::DMX === packet)
     type = (packet.sender_ip == artnet.local_ip ? 'Transmitted' : 'Received')
     gui.msgs.insert nil, :end, text: packet.received_at, values: [type, packet.sender_name, packet.type]
+    if SettingsReply === packet
+      gui.new_ip.value = packet.ip
+      gui.new_netmask.value = packet.netmask
+      gui.new_gateway.value = packet.gateway
+      gui.net_mode.value = packet.netmode
+      gui.setting_items.each do |item|
+        item.state :normal
+      end
+    end
   end
 end
 artnet.poll_nodes
