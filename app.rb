@@ -49,7 +49,6 @@ TkRoot.new do |p|
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
           gui.mac = TkLabel.new(p) do
-            text 'hello'
             pack('side' => 'left', fill: 'both', expand: true)
           end
         end
@@ -58,7 +57,6 @@ TkRoot.new do |p|
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
           gui.ip = TkLabel.new(p) do
-            text 'hello'
             pack('side' => 'left', fill: 'both', expand: true)
           end
         end
@@ -69,47 +67,69 @@ TkRoot.new do |p|
           text 'Network Settings'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
-          TkLabel.new(p) do
-            text 'Ip Address'
+          TkFrame.new(p) do |p|
             pack('side' => 'top', fill: 'both', expand: true)
+            TkLabel.new(p) do
+              text 'Ip Address'
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+            Tk::Tile::Entry.new(p) do
+              textvariable gui.new_ip = TkVariable.new
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
           end
-          TkLabel.new(p) do
-            text 'Subnet Mask'
+          TkFrame.new(p) do |p|
             pack('side' => 'top', fill: 'both', expand: true)
+            TkLabel.new(p) do
+              text 'Subnet Mask'
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+            Tk::Tile::Entry.new(p) do
+              textvariable gui.new_netmask = TkVariable.new
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
           end
-          TkLabel.new(p) do
-            text 'Default Gateway'
+          TkFrame.new(p) do |p|
             pack('side' => 'top', fill: 'both', expand: true)
+            TkLabel.new(p) do
+              text 'Default Gateway'
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+            Tk::Tile::Entry.new(p) do
+              textvariable gui.new_gateway = TkVariable.new
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
           end
         end
         TkLabelFrame.new(p) do |p|
           text 'Network Mode'
+          gui.net_mode = TkVariable.new
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
           TkRadioButton.new(p) do
             text '2.X.Y.Z'
-            variable $v
+            variable gui.net_mode
             value '2.X.Y.Z'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
           TkRadioButton.new(p) do
             text '10.X.Y.Z'
-            variable $v
+            variable gui.net_mode
             value '10.X.Y.Z'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
           TkRadioButton.new(p) do
             text 'Custom IP'
-            variable $v
+            variable gui.net_mode
             value 'custom'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
           TkRadioButton.new(p) do
             text 'DHCP'
-            variable $v
+            variable gui.net_mode
             value 'dhcp'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
@@ -122,6 +142,32 @@ TkRoot.new do |p|
           text 'Hardware Information'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
+          TkLabelFrame.new(p) do |p|
+            borderwidth 0
+            pack('side' => 'top', fill: 'both', expand: true)
+            TkLabel.new(p) do
+              text 'Firmware Version'
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+            gui.firmware = TkLabel.new(p) do
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+          end
+          TkLabelFrame.new(p) do |p|
+            borderwidth 0
+            pack('side' => 'top', fill: 'both', expand: true)
+            TkLabel.new(p) do
+              text 'Device'
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+            gui.device_name = TkLabel.new(p) do
+              pack('side' => 'left', fill: 'both', expand: true)
+            end
+          end
+          gui.name = TkLabel.new(p) do
+            wraplength 200
+            pack('side' => 'left', fill: 'both', expand: true)
+          end
         end
         TkLabelFrame.new(p) do |p|
           text 'Commands'
@@ -184,6 +230,15 @@ gui.devices.bind('<TreeviewSelect>') do |e|
   node = artnet.node(ip)
   gui.ip.text = node.ip
   gui.mac.text = node.mac
+  gui.name.text = node.longname
+  gui.firmware.text = node.firmware_version
+  if true # unknown device
+    gui.device_name.text = 'Unknown Device'
+    gui.new_ip.value = ''
+    gui.new_netmask.value = ''
+    gui.new_gateway.value = ''
+    gui.net_mode.value = ''
+  end
 end
 gui.thread = Thread.new do
   Tk.mainloop
