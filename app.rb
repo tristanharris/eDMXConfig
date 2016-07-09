@@ -2,11 +2,27 @@ require 'tk'
 require 'art_net'
 require 'ostruct'
 
+TkOption.add '*tearOff', 0
+
 artnet = ArtNet::IO.new :network => "192.168.0.100", :netmask => "255.255.255.0"
 gui = OpenStruct.new
 gui.setting_items = []
-TkRoot.new do |p|
+gui.root = TkRoot.new do |p|
   title "eDMX Configuration"
+  p['menu'] = TkMenu.new(p) do |p|
+    file = TkMenu.new(p) do |p|
+      add :command, :label => 'Quit', :command => proc{gui.root.destroy}
+    end
+    advanced = TkMenu.new(p) do |p|
+      m = TkMenu.new(p) do |p|
+        add :command, :label => 'Short Name', :command => proc{gui.name_window(:short)}
+        add :command, :label => 'Long Name', :command => proc{gui.name_window(:long)}
+      end
+      add :cascade, :label => 'Edit Node Name', :menu => m
+    end
+    add :cascade, :menu => file, :label => 'File'
+    add :cascade, :menu => advanced, :label => 'Advanced'
+  end
 
   TkFrame.new(p) do |p|
     pack('side' => 'top', fill: 'both', expand: true)
@@ -237,9 +253,55 @@ def gui.disable
   end
 end
 
+def gui.name_window(type)
+  self.new_name ||= TkVariable.new
+  new_name = self.new_name
+  new_name.value = type == :short ? node.shortname : node.longname
+  gui = self
+  win = TkToplevel.new(root) do |p|
+    title 'Edit Art-Net Node Name'
+    set_focus
+    grab
+    transient(root)
+    TkLabel.new(p) do
+      text type == :short ? 'Short Name (17 character max)' : 'Long Name (63 character max)'
+      pack('side' => 'top', fill: 'both', expand: true)
+    end
+    Tk::Tile::Entry.new(p) do
+      textvariable new_name
+      pack('side' => 'top', fill: 'both', expand: true)
+    end
+    TkFrame.new(p) do |p|
+      pack('side' => 'top', fill: 'both', expand: true)
+      TkButton.new(p) do
+        text 'OK'
+        command proc {
+          packet = ArtNet::Packet::Address.new
+          packet.short_name = gui.node.shortname
+          packet.long_name = gui.node.longname
+          if type == :short
+            packet.short_name = new_name.value
+          else
+            packet.long_name = new_name.value
+          end
+          gui.artnet.transmit packet, gui.node
+          win.destroy
+        }
+        pack(side: 'left', fill: 'both', expand: true)
+      end
+      TkButton.new(p) do
+        text 'Cancel'
+        command proc {win.destroy}
+        pack(side: 'left', fill: 'both', expand: true)
+      end
+    end
+  end
+end
+
 gui.devices.bind('<TreeviewSelect>') do |e|
   ip = e.widget.selection.first.id
   node = artnet.node(ip)
+  gui.node = node
   gui.ip.text = node.ip
   gui.mac.text = node.mac
   gui.name.text = node.longname
@@ -249,6 +311,7 @@ gui.devices.bind('<TreeviewSelect>') do |e|
     gui.disable
   end
 end
+gui.artnet = artnet
 gui.disable
 gui.thread = Thread.new do
   Tk.mainloop
