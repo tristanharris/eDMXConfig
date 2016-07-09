@@ -4,6 +4,7 @@ require 'ostruct'
 
 artnet = ArtNet::IO.new :network => "192.168.0.100", :netmask => "255.255.255.0"
 gui = OpenStruct.new
+gui.setting_items = []
 TkRoot.new do |p|
   title "eDMX Configuration"
 
@@ -73,7 +74,7 @@ TkRoot.new do |p|
               text 'Ip Address'
               pack('side' => 'left', fill: 'both', expand: true)
             end
-            Tk::Tile::Entry.new(p) do
+            gui.setting_items << Tk::Tile::Entry.new(p) do
               textvariable gui.new_ip = TkVariable.new
               pack('side' => 'left', fill: 'both', expand: true)
             end
@@ -84,7 +85,7 @@ TkRoot.new do |p|
               text 'Subnet Mask'
               pack('side' => 'left', fill: 'both', expand: true)
             end
-            Tk::Tile::Entry.new(p) do
+            gui.setting_items << Tk::Tile::Entry.new(p) do
               textvariable gui.new_netmask = TkVariable.new
               pack('side' => 'left', fill: 'both', expand: true)
             end
@@ -95,7 +96,7 @@ TkRoot.new do |p|
               text 'Default Gateway'
               pack('side' => 'left', fill: 'both', expand: true)
             end
-            Tk::Tile::Entry.new(p) do
+            gui.setting_items << Tk::Tile::Entry.new(p) do
               textvariable gui.new_gateway = TkVariable.new
               pack('side' => 'left', fill: 'both', expand: true)
             end
@@ -106,28 +107,28 @@ TkRoot.new do |p|
           gui.net_mode = TkVariable.new
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
-          TkRadioButton.new(p) do
+          gui.setting_items << TkRadioButton.new(p) do
             text '2.X.Y.Z'
             variable gui.net_mode
             value '2.X.Y.Z'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
-          TkRadioButton.new(p) do
+          gui.setting_items << TkRadioButton.new(p) do
             text '10.X.Y.Z'
             variable gui.net_mode
             value '10.X.Y.Z'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
-          TkRadioButton.new(p) do
+          gui.setting_items << TkRadioButton.new(p) do
             text 'Custom IP'
             variable gui.net_mode
             value 'custom'
             anchor 'w'
             pack('side' => 'top', 'fill' => 'x')
           end
-          TkRadioButton.new(p) do
+          gui.setting_items << TkRadioButton.new(p) do
             text 'DHCP'
             variable gui.net_mode
             value 'dhcp'
@@ -173,11 +174,11 @@ TkRoot.new do |p|
           text 'Commands'
           borderwidth 1
           pack('side' => 'left', fill: 'both', expand: true)
-          TkButton.new(p) do
+          gui.setting_items << TkButton.new(p) do
             text 'Update Network Settings'
             pack(fill: 'both', expand: true)
           end
-          TkButton.new(p) do
+          gui.setting_items << TkButton.new(p) do
             text 'Firmware Update'
             pack(fill: 'both', expand: true)
           end
@@ -225,6 +226,17 @@ TkRoot.new do |p|
     end
   end
 end
+
+def gui.disable
+  new_ip.value = ''
+  new_netmask.value = ''
+  new_gateway.value = ''
+  net_mode.value = ''
+  setting_items.each do |item|
+    item.state :disabled
+  end
+end
+
 gui.devices.bind('<TreeviewSelect>') do |e|
   ip = e.widget.selection.first.id
   node = artnet.node(ip)
@@ -234,12 +246,10 @@ gui.devices.bind('<TreeviewSelect>') do |e|
   gui.firmware.text = node.firmware_version
   if true # unknown device
     gui.device_name.text = 'Unknown Device'
-    gui.new_ip.value = ''
-    gui.new_netmask.value = ''
-    gui.new_gateway.value = ''
-    gui.net_mode.value = ''
+    gui.disable
   end
 end
+gui.disable
 gui.thread = Thread.new do
   Tk.mainloop
 end
