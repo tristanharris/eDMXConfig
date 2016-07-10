@@ -8,7 +8,8 @@ ArtNet::Packet.register(0xf9f0, SettingsReply)
 
 TkOption.add '*tearOff', 0
 
-artnet = ArtNet::IO.new :network => "192.168.0.100", :netmask => "255.255.255.0"
+local_ips = Socket.getifaddrs.select{|a| a.addr.ipv4? && !a.addr.ipv4_loopback?}
+artnet = ArtNet::IO.new :network => local_ips[0].addr.ip_address, :netmask => local_ips[0].netmask.ip_address
 gui = OpenStruct.new
 gui.setting_items = []
 gui.ports = []
@@ -58,12 +59,7 @@ gui.root = TkRoot.new do |p|
         text 'Search For Device'
         pack(fill: 'both', expand: true)
         command proc {
-          gui.devices.children('').each {|c| gui.devices.delete c }
-          gui.disable
-          (gui.tabs.tabs.count - 1).times do
-            gui.tabs.forget(1)
-          end
-          gui.ports.clear
+          gui.reset
           gui.artnet.poll_nodes
         }
       end
@@ -233,13 +229,25 @@ gui.root = TkRoot.new do |p|
             text 'Network Adapter IP Address'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
+            gui.adapter_ip = Tk::Tile::Combobox.new(p) do
+              values local_ips.map{|a| a.addr.ip_address}
+              pack('side' => 'left', fill: 'both', expand: true)
+              state :readonly
+              set artnet.local_ip
+              bind("<ComboboxSelected>") do |*l|
+                gui.adapter_ip.selection_clear
+                gui.adapter_mask.text = gui.artnet.netmask
+                gui.reset
+                gui.artnet.reconnect(local_ips[current].addr.ip_address, local_ips[current].netmask.ip_address)
+              end
+            end
           end
           TkLabelFrame.new(p) do |p|
             text 'Network Adapter Subnet Mask'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            adapter_mask = TkLabel.new(p) do
-              text 'hello'
+            gui.adapter_mask = TkLabel.new(p) do
+              text artnet.netmask
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
@@ -280,6 +288,15 @@ def gui.disable
   setting_items.each do |item|
     item.state :disabled
   end
+end
+
+def gui.reset
+  disable
+  devices.children('').each {|c| devices.delete c }
+  (tabs.tabs.count - 1).times do
+    tabs.forget(1)
+  end
+  ports.clear
 end
 
 def gui.name_window(type)
