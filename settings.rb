@@ -4,6 +4,8 @@ class Settings < ArtNet::Packet::Base
 
     attr_accessor :rdm_spacing, :rdm_discovery, :update_rate, :addr
 
+    OPERATION_MODES = {0 => :artnet, 1 => :dmx, 2 => :sacn}
+
     def initialize
       @operation_mode = 0
       @rdm_spacing = 0
@@ -21,16 +23,35 @@ class Settings < ArtNet::Packet::Base
       @flags & 1 == 0 ? :htp : :ltp
     end
 
+    def merge_mode=(v)
+      @flags &= ~1
+      @flags |= 1 if v.to_sym == :ltp
+    end
+
     def operation_mode
-      {0 => :artnet, 1 => :dmx, 2 => :scan}[@operation_mode]
+      OPERATION_MODES[@operation_mode]
+    end
+
+    def operation_mode=(v)
+      @operation_mode = OPERATION_MODES.invert[v.to_sym] || 1
     end
 
     def timeout_sources?
       @flags & 2 != 0
     end
 
+    def timeout_sources=(v)
+      @flags &= ~2
+      @flags |= 2 if v
+    end
+
     def recall_dmx?
       @flags & 4 != 0
+    end
+
+    def recall_dmx=(v)
+      @flags &= ~4
+      @flags |= 4 if v
     end
 
     def unpack(data)
@@ -53,10 +74,16 @@ class Settings < ArtNet::Packet::Base
     @netmode = 0
     @ports = []
     @ports << Port.new
+    @cmd = [0] * 10
+  end
+
+  def update!
+    #Don't know what this chunk does but it's needed to perfom an update
+    @cmd = [0x84, 0x00, 0x12, 0x34, 0x56, 0x78, 0x87, 0x65, 0x43, 0x21]
   end
 
   def pack
-    data = [ArtNet::Packet::ID, opcode, ArtNet::Packet::PROTVER, @mac.to_bytes, @ip.to_i, @netmask.to_i, @gateway.to_i, @netmode].pack "Z7xvn x18a6NNNCx"
+    data = [ArtNet::Packet::ID, opcode, ArtNet::Packet::PROTVER, @cmd.pack('C10'), @mac.to_bytes, @ip.to_i, @netmask.to_i, @gateway.to_i, @netmode].pack "Z7xvn a10x8a6NNNCx"
     data + @ports.map(&:pack).join
   end
 #48*0 request
@@ -78,7 +105,7 @@ class SettingsReply < ArtNet::Packet::Base
   attr_reader :mac, :ip, :netmask, :gateway, :netmode, :ports
 
   def unpack(data)
-    version, @mac, ip, netmask, gateway, @netmode = data.unpack 'nx18a6NNNCx'
+    version, @mac, ip, netmask, gateway, @netmode = data.unpack 'nx10x8a6NNNCx'
     check_version(version)
     @ip = ::IPAddr.new(ip,  Socket::AF_INET)
     @netmask = ::IPAddr.new(netmask,  Socket::AF_INET)

@@ -11,6 +11,7 @@ TkOption.add '*tearOff', 0
 artnet = ArtNet::IO.new :network => "192.168.0.100", :netmask => "255.255.255.0"
 gui = OpenStruct.new
 gui.setting_items = []
+gui.ports = []
 gui.root = TkRoot.new do |p|
   title "eDMX Configuration"
   p['menu'] = TkMenu.new(p) do |p|
@@ -310,7 +311,7 @@ end
 def gui.port_tab(port)
   gui = self
   vars = OpenStruct.new
-  TkFrame.new(tabs) do |p|
+  frame = TkFrame.new(tabs) do |p|
     TkLabelFrame.new(p) do |p|
       text 'ArtNet Settings'
       borderwidth 1
@@ -327,7 +328,7 @@ def gui.port_tab(port)
           length 200
           from 1
           to 40
-          set port.update_rate
+          variable vars.update_rate = TkVariable.new(port.update_rate)
         end
         value = TkLabel.new(p) do
           pack('side' => 'left', fill: 'both', expand: true)
@@ -385,7 +386,7 @@ def gui.port_tab(port)
           text 'Timeout all sources'
           onvalue true
           offvalue false
-          variable TkVariable.new port.timeout_sources?
+          variable vars.timeout_sources = TkVariable.new(port.timeout_sources?)
           pack('side' => 'top', 'fill' => 'x')
         end
       end
@@ -433,7 +434,7 @@ def gui.port_tab(port)
           length 200
           from 0
           to 600
-          set port.rdm_discovery
+          variable vars.rdm_discovery = TkVariable.new(port.rdm_discovery)
         end
         value = TkLabel.new(p) do
           pack('side' => 'left', fill: 'both', expand: true)
@@ -455,7 +456,7 @@ def gui.port_tab(port)
           length 200
           from 0
           to 40
-          set port.rdm_spacing
+          variable vars.rdm_spacing = TkVariable.new(port.rdm_spacing)
         end
         value = TkLabel.new(p) do
           pack('side' => 'left', fill: 'both', expand: true)
@@ -472,7 +473,7 @@ def gui.port_tab(port)
         text 'Recall DMX snapshot at startup'
         onvalue true
         offvalue false
-        variable TkVariable.new port.recall_dmx?
+        variable vars.recall_dmx = TkVariable.new(port.recall_dmx?)
         pack('side' => 'left', 'fill' => 'x')
       end
       TkButton.new(p) do
@@ -488,7 +489,21 @@ def gui.port_tab(port)
       TkButton.new(p) do
         text 'Update'
         command proc {
-          #gui.artnet.transmit Settings.new, gui.node
+          packet = Settings.new
+          packet.ports = gui.ports.map do |port|
+            set_port = Settings::Port.new
+            set_port.rdm_spacing = port.rdm_spacing.value.to_i
+            set_port.rdm_discovery = port.rdm_discovery.value.to_i
+            set_port.update_rate = port.update_rate.value.to_i
+            set_port.addr = port.universe.value.to_i - 1
+            set_port.merge_mode = port.merge_mode.value
+            set_port.timeout_sources = port.timeout_sources.value == '1'
+            set_port.recall_dmx = port.recall_dmx.value == '1'
+            set_port.operation_mode = port.operation_mode.value
+            set_port
+          end
+          packet.update!
+          gui.artnet.transmit packet, gui.node
         }
         pack(side: 'left', fill: 'both', expand: true)
       end
@@ -515,6 +530,7 @@ def gui.port_tab(port)
       end
     end
   end
+  [frame, vars]
 end
 
 gui.devices.bind('<TreeviewSelect>') do |e|
@@ -554,8 +570,11 @@ artnet.on :message do |packet|
       (gui.tabs.tabs.count - 1).times do
         gui.tabs.forget(1)
       end
+      gui.ports.clear
       packet.ports.each_with_index do |port, i|
-        gui.tabs.add gui.port_tab(port), text: 'Port ' + (i+65).chr
+        frame, vars = gui.port_tab(port)
+        gui.ports[i] = vars
+        gui.tabs.add frame, text: 'Port ' + (i+65).chr
       end
       gui.setting_items.each do |item|
         item.state :normal
