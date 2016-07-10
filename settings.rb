@@ -1,7 +1,55 @@
 class Settings < ArtNet::Packet::Base
 
+  class Port
+
+    attr_accessor :operation_mode, :rdm_spacing, :rdm_discovery, :update_rate, :addr
+
+    def initialize
+      @operation_mode = 0
+      @rdm_spacing = 0
+      @rdm_discovery = 0
+      @update_rate = 0
+      @addr = 0
+      @flags = 0
+    end
+
+    def merge
+      @flags & 1 == 0 ? :htp : :ltp
+    end
+
+    def timeout_sources?
+      @flags & 2 != 0
+    end
+
+    def recall_dmx?
+      @flags & 4 != 0
+    end
+
+    def unpack(data)
+      @operation_mode, @flags, @rdm_spacing, @rdm_discovery, @update_rate, @addr = data.unpack "CCxCnxCn"
+    end
+
+    def pack
+      [@operation_mode, @flags, @rdm_spacing, @rdm_discovery, @update_rate, @addr].pack "CCxCnxCn"
+    end
+
+  end
+
+  attr_accessor :mac, :ip, :netmask, :gateway, :netmode, :ports
+
+  def initialize
+    @mac = ArtNet::MacAddr.new
+    @ip = ::IPAddr.new(0,  Socket::AF_INET)
+    @netmask = ::IPAddr.new(0,  Socket::AF_INET)
+    @gateway = ::IPAddr.new(0,  Socket::AF_INET)
+    @netmode = 0
+    @ports = []
+    @ports << Port.new
+  end
+
   def pack
-    [ArtNet::Packet::ID, opcode, ArtNet::Packet::PROTVER].pack "Z7xvnx48"
+    data = [ArtNet::Packet::ID, opcode, ArtNet::Packet::PROTVER, @mac.to_bytes, @ip.to_i, @netmask.to_i, @gateway.to_i, @netmode].pack "Z7xvn x18a6NNNCx"
+    data + @ports.map(&:pack).join
   end
 #48*0 request
   #
@@ -22,19 +70,16 @@ class SettingsReply < ArtNet::Packet::Base
   attr_reader :mac, :ip, :netmask, :gateway, :netmode, :ports
 
   def unpack(data)
-    version, @mac, ip, netmask, gateway, @netmode, final = data.unpack 'nx18a6NNNCxC'
+    version, @mac, ip, netmask, gateway, @netmode = data.unpack 'nx18a6NNNCx'
     check_version(version)
     @ip = ::IPAddr.new(ip,  Socket::AF_INET)
     @netmask = ::IPAddr.new(netmask,  Socket::AF_INET)
     @gateway = ::IPAddr.new(gateway,  Socket::AF_INET)
     ptr = 40
     @ports = []
-    while !final.nil?
-      port = OpenStruct.new
-      port.operation_mode, flags, port.rdm_spacing, port.rdm_discovery, port.update_rate, port.addr, final = data.unpack "@#{ptr}CCxCnxCnC"
-      port.merge = flags & 1 == 0 ? :htp : :ltp
-      port.timeout_sources = flags & 2 != 0
-      port.recall_dmx = flags & 4 != 0
+    while !data.unpack("@#{ptr}C").first.nil?
+      port = Settings::Port.new
+      port.unpack data.unpack("@#{ptr}a10").first
       @ports << port
       ptr += 10
     end
