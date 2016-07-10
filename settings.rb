@@ -77,9 +77,15 @@ class Settings < ArtNet::Packet::Base
     @cmd = [0] * 10
   end
 
-  def update!
+  def update!(type)
+    cmd = nil
+    if type == :ports
+      cmd = 0x84
+    elsif type == :network
+      cmd = 0x85
+    end
     #Don't know what this chunk does but it's needed to perfom an update
-    @cmd = [0x84, 0x00, 0x12, 0x34, 0x56, 0x78, 0x87, 0x65, 0x43, 0x21]
+    @cmd = [cmd, 0x00, 0x12, 0x34, 0x56, 0x78, 0x87, 0x65, 0x43, 0x21] unless cmd.nil?
   end
 
   def pack

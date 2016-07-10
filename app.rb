@@ -198,7 +198,17 @@ gui.root = TkRoot.new do |p|
             gui.setting_items << TkButton.new(p) do
               text 'Update Network Settings'
               command proc {
-                gui.artnet.transmit Settings.new, gui.node
+                packet = Settings.new
+                packet.mac = gui.node.mac
+                packet.ip = ::IPAddr.new(gui.new_ip.value,  Socket::AF_INET)
+                packet.netmask = ::IPAddr.new(gui.new_netmask.value,  Socket::AF_INET)
+                packet.gateway = ::IPAddr.new(gui.new_gateway.value,  Socket::AF_INET)
+                packet.netmode = gui.net_mode.value.to_i
+                packet.ports = gui.ports.map do |port|
+                  translate_port(port)
+                end
+                packet.update! :network
+                gui.artnet.transmit packet, gui.node
               }
               pack(fill: 'both', expand: true)
             end
@@ -491,18 +501,9 @@ def gui.port_tab(port)
         command proc {
           packet = Settings.new
           packet.ports = gui.ports.map do |port|
-            set_port = Settings::Port.new
-            set_port.rdm_spacing = port.rdm_spacing.value.to_i
-            set_port.rdm_discovery = port.rdm_discovery.value.to_i
-            set_port.update_rate = port.update_rate.value.to_i
-            set_port.addr = port.universe.value.to_i - 1
-            set_port.merge_mode = port.merge_mode.value
-            set_port.timeout_sources = port.timeout_sources.value == '1'
-            set_port.recall_dmx = port.recall_dmx.value == '1'
-            set_port.operation_mode = port.operation_mode.value
-            set_port
+            translate_port(port)
           end
-          packet.update!
+          packet.update! :ports
           gui.artnet.transmit packet, gui.node
         }
         pack(side: 'left', fill: 'both', expand: true)
@@ -531,6 +532,19 @@ def gui.port_tab(port)
     end
   end
   [frame, vars]
+end
+
+def translate_port(port)
+  set_port = Settings::Port.new
+  set_port.rdm_spacing = port.rdm_spacing.value.to_i
+  set_port.rdm_discovery = port.rdm_discovery.value.to_i
+  set_port.update_rate = port.update_rate.value.to_i
+  set_port.addr = port.universe.value.to_i - 1
+  set_port.merge_mode = port.merge_mode.value
+  set_port.timeout_sources = port.timeout_sources.value == '1'
+  set_port.recall_dmx = port.recall_dmx.value == '1'
+  set_port.operation_mode = port.operation_mode.value
+  set_port
 end
 
 gui.devices.bind('<TreeviewSelect>') do |e|
