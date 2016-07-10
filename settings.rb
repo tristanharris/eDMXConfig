@@ -2,7 +2,7 @@ class Settings < ArtNet::Packet::Base
 
   class Port
 
-    attr_accessor :rdm_spacing, :rdm_discovery, :update_rate, :addr
+    attr_accessor :rdm_spacing, :rdm_discovery, :update_rate, :addr, :id
 
     OPERATION_MODES = {0 => :artnet, 1 => :dmx, 2 => :sacn}
 
@@ -118,11 +118,14 @@ class SettingsReply < ArtNet::Packet::Base
     @gateway = ::IPAddr.new(gateway,  Socket::AF_INET)
     ptr = 40
     @ports = []
+    cnt = 0
     while !data.unpack("@#{ptr}C").first.nil?
       port = Settings::Port.new
+      port.id = cnt
       port.unpack data.unpack("@#{ptr}a10").first
       @ports << port
       ptr += 10
+      cnt += 1
     end
   end
 

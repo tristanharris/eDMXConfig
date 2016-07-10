@@ -2,9 +2,11 @@ require 'tk'
 require 'art_net'
 require 'ostruct'
 require_relative 'settings'
+require_relative 'snapshot'
 
 ArtNet::Packet.register(0xf8f0, Settings)
 ArtNet::Packet.register(0xf9f0, SettingsReply)
+ArtNet::Packet.register(0xfcf0, Snapshot)
 
 TkOption.add '*tearOff', 0
 
@@ -515,7 +517,9 @@ def gui.port_tab(port)
       TkButton.new(p) do
         text 'Snapshot DMX'
         command proc {
-          #gui.artnet.transmit Settings.new, gui.node
+          packet = Snapshot.new
+          packet.port_id = port.id
+          gui.artnet.transmit packet, gui.node
         }
         pack(side: 'left', fill: 'both', expand: true)
       end
