@@ -2,7 +2,7 @@ class Settings < ArtNet::Packet::Base
 
   class Port
 
-    attr_accessor :operation_mode, :rdm_spacing, :rdm_discovery, :update_rate, :addr
+    attr_accessor :rdm_spacing, :rdm_discovery, :update_rate, :addr
 
     def initialize
       @operation_mode = 0
@@ -13,8 +13,16 @@ class Settings < ArtNet::Packet::Base
       @flags = 0
     end
 
-    def merge
+    def broadcast_threshold
+      0 #Not sure where this comes from
+    end
+
+    def merge_mode
       @flags & 1 == 0 ? :htp : :ltp
+    end
+
+    def operation_mode
+      {0 => :artnet, 1 => :dmx, 2 => :scan}[@operation_mode]
     end
 
     def timeout_sources?

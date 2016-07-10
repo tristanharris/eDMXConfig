@@ -307,6 +307,216 @@ def gui.name_window(type)
   end
 end
 
+def gui.port_tab(port)
+  gui = self
+  vars = OpenStruct.new
+  TkFrame.new(tabs) do |p|
+    TkLabelFrame.new(p) do |p|
+      text 'ArtNet Settings'
+      borderwidth 1
+      pack('side' => 'top', fill: 'both', expand: true)
+      TkFrame.new(p) do |p|
+        pack('side' => 'top', fill: 'both', expand: true)
+        TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text 'Update Rate'
+        end
+        scale = Tk::Tile::Scale.new(p) do
+          pack('side' => 'left')
+          orient 'horizontal'
+          length 200
+          from 1
+          to 40
+          set port.update_rate
+        end
+        value = TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text port.update_rate.to_s + 'Hz'
+        end
+        scale.command proc{|v|
+          value.text v.to_i.to_s + 'Hz'
+        }
+      end
+      TkFrame.new(p) do |p|
+        pack('side' => 'top', fill: 'both', expand: true)
+        TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text 'Broadcast Threshold'
+        end
+        scale = Tk::Tile::Scale.new(p) do
+          pack('side' => 'left')
+          orient 'horizontal'
+          length 200
+          from 0
+          to 20
+          set port.broadcast_threshold
+        end
+        value = TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text port.broadcast_threshold.to_s
+        end
+        scale.command proc{|v|
+          value.text v.to_i.to_s
+        }
+      end
+    end
+    TkFrame.new(p) do |p|
+      pack('side' => 'top', fill: 'both', expand: true)
+      TkLabelFrame.new(p) do |p|
+        text 'Merge Mode'
+        borderwidth 1
+        pack('side' => 'left', fill: 'both', expand: true)
+        vars.merge_mode = TkVariable.new port.merge_mode
+        TkRadioButton.new(p) do
+          text 'Highest Takes Priority (HTP)'
+          variable vars.merge_mode
+          value :htp
+          anchor 'w'
+          pack('side' => 'top', 'fill' => 'x')
+        end
+        TkRadioButton.new(p) do
+          text 'Latest Takes Priority (LTP)'
+          variable vars.merge_mode
+          value :ltp
+          anchor 'w'
+          pack('side' => 'top', 'fill' => 'x')
+        end
+        Tk::Tile::CheckButton.new(p) do
+          text 'Timeout all sources'
+          onvalue true
+          offvalue false
+          variable TkVariable.new port.timeout_sources?
+          pack('side' => 'top', 'fill' => 'x')
+        end
+      end
+      TkLabelFrame.new(p) do |p|
+        text 'Operation Mode'
+        borderwidth 1
+        pack('side' => 'left', fill: 'both', expand: true)
+        vars.operation_mode = TkVariable.new(port.operation_mode)
+        TkRadioButton.new(p) do
+          text 'DMX In Art-Net'
+          variable vars.operation_mode
+          value :artnet
+          anchor 'w'
+          pack('side' => 'top', 'fill' => 'x')
+        end
+        TkRadioButton.new(p) do
+          text 'DMX In sACN'
+          variable vars.operation_mode
+          value :sacn
+          anchor 'w'
+          pack('side' => 'top', 'fill' => 'x')
+        end
+        TkRadioButton.new(p) do
+          text 'DMX Out'
+          variable vars.operation_mode
+          value :dmx
+          anchor 'w'
+          pack('side' => 'top', 'fill' => 'x')
+        end
+      end
+    end
+    TkLabelFrame.new(p) do |p|
+      text 'RDM Settings'
+      borderwidth 1
+      pack('side' => 'top', fill: 'both', expand: true)
+      TkFrame.new(p) do |p|
+        pack('side' => 'top', fill: 'both', expand: true)
+        TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text 'Discovery Period'
+        end
+        scale = Tk::Tile::Scale.new(p) do
+          pack('side' => 'left')
+          orient 'horizontal'
+          length 200
+          from 0
+          to 600
+          set port.rdm_discovery
+        end
+        value = TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text port.rdm_discovery.to_s + 's'
+        end
+        scale.command proc{|v|
+          value.text v.to_i.to_s + 's'
+        }
+      end
+      TkFrame.new(p) do |p|
+        pack('side' => 'top', fill: 'both', expand: true)
+        TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text 'Packet Spacing'
+        end
+        scale = Tk::Tile::Scale.new(p) do
+          pack('side' => 'left')
+          orient 'horizontal'
+          length 200
+          from 0
+          to 40
+          set port.rdm_spacing
+        end
+        value = TkLabel.new(p) do
+          pack('side' => 'left', fill: 'both', expand: true)
+          text port.rdm_spacing.to_s + '1/20s'
+        end
+        scale.command proc{|v|
+          value.text v.to_i.to_s + ' 1/20s'
+        }
+      end
+    end
+    TkFrame.new(p) do |p|
+      pack('side' => 'top', fill: 'both', expand: true)
+      Tk::Tile::CheckButton.new(p) do
+        text 'Recall DMX snapshot at startup'
+        onvalue true
+        offvalue false
+        variable TkVariable.new port.recall_dmx?
+        pack('side' => 'left', 'fill' => 'x')
+      end
+      TkButton.new(p) do
+        text 'Snapshot DMX'
+        command proc {
+          #gui.artnet.transmit Settings.new, gui.node
+        }
+        pack(side: 'left', fill: 'both', expand: true)
+      end
+    end
+    TkFrame.new(p) do |p|
+      pack('side' => 'top', fill: 'both', expand: true)
+      TkButton.new(p) do
+        text 'Update'
+        command proc {
+          #gui.artnet.transmit Settings.new, gui.node
+        }
+        pack(side: 'left', fill: 'both', expand: true)
+      end
+      TkLabelFrame.new(p) do |p|
+        text 'Universe'
+        borderwidth 1
+        pack('side' => 'left', fill: 'both', expand: true)
+        Tk::Tile::Entry.new(p) do
+          textvariable vars.universe = TkVariable.new
+          pack('side' => 'left', fill: 'both', expand: true)
+        end
+        TkLabelFrame.new(p) do |p|
+          text 'Art-Net Address'
+          borderwidth 0
+          pack('side' => 'left', fill: 'both', expand: true)
+          TkLabel.new(p) do
+            vars.universe.trace :w, proc{|v|
+              text '%04X' % (v.value.to_i - 1)
+            }
+            pack('side' => 'left', fill: 'both', expand: true)
+          end
+          vars.universe.value = port.addr + 1
+        end
+      end
+    end
+  end
+end
+
 gui.devices.bind('<TreeviewSelect>') do |e|
   ip = e.widget.selection.first.id
   node = artnet.node(ip)
@@ -345,7 +555,7 @@ artnet.on :message do |packet|
         gui.tabs.forget(1)
       end
       packet.ports.each_with_index do |port, i|
-        gui.tabs.add TkFrame.new, text: 'Port ' + (i+65).chr
+        gui.tabs.add gui.port_tab(port), text: 'Port ' + (i+65).chr
       end
       gui.setting_items.each do |item|
         item.state :normal
