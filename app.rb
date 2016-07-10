@@ -57,6 +57,15 @@ gui.root = TkRoot.new do |p|
       TkButton.new(p) do
         text 'Search For Device'
         pack(fill: 'both', expand: true)
+        command proc {
+          gui.devices.children('').each {|c| gui.devices.delete c }
+          gui.disable
+          (gui.tabs.tabs.count - 1).times do
+            gui.tabs.forget(1)
+          end
+          gui.ports.clear
+          gui.artnet.poll_nodes
+        }
       end
     end
 
