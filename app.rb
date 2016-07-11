@@ -605,7 +605,7 @@ end
 artnet.on :message do |packet|
   if !(ArtNet::Packet::DMX === packet)
     type = (packet.sender_ip == artnet.local_ip ? 'Transmitted' : 'Received')
-    gui.msgs.insert nil, :end, text: packet.received_at, values: [type, packet.sender_name, packet.type]
+    gui.msgs.insert nil, 0, text: packet.received_at, values: [type, packet.sender_name, packet.type]
     if SettingsReply === packet
       gui.new_ip.value = packet.ip
       gui.new_netmask.value = packet.netmask
