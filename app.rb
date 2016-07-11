@@ -4,9 +4,9 @@ require 'ostruct'
 require_relative 'settings'
 require_relative 'snapshot'
 
-ArtNet::Packet.register(0xf8f0, Settings)
-ArtNet::Packet.register(0xf9f0, SettingsReply)
-ArtNet::Packet.register(0xfcf0, Snapshot)
+ArtNet::Packet.register Settings
+ArtNet::Packet.register SettingsReply
+ArtNet::Packet.register Snapshot
 
 TkOption.add '*tearOff', 0
 

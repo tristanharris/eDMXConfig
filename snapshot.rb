@@ -1,5 +1,7 @@
 class Snapshot < ArtNet::Packet::Base
 
+  OPCODE = 0xfcf0
+
   attr_accessor :port_id
 
   def pack

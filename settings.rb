@@ -1,5 +1,7 @@
 class Settings < ArtNet::Packet::Base
 
+  OPCODE = 0xf8f0
+
   class Port
 
     attr_accessor :rdm_spacing, :rdm_discovery, :update_rate, :addr, :id
@@ -107,6 +109,8 @@ class Settings < ArtNet::Packet::Base
 end
 
 class SettingsReply < ArtNet::Packet::Base
+
+  OPCODE = 0xf9f0
 
   attr_reader :mac, :ip, :netmask, :gateway, :netmode, :ports
 
