@@ -612,7 +612,7 @@ artnet.on :message do |packet|
         gui.tabs.add frame, text: 'Port ' + (i+65).chr
       end
       gui.setting_items.each do |item|
-        item.state :normal
+        item.state '!disabled'
       end
     end
   end
