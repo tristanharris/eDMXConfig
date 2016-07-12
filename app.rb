@@ -15,14 +15,14 @@ artnet = ArtNet::IO.new :network => local_ips[0].addr.ip_address, :netmask => lo
 gui = OpenStruct.new
 gui.setting_items = []
 gui.ports = []
-gui.root = TkRoot.new do |p|
+gui.root = TkRoot.new do
   title "eDMX Configuration"
-  p['menu'] = TkMenu.new(p) do |p|
-    file = TkMenu.new(p) do |p|
+  self['menu'] = TkMenu.new(self) do
+    file = TkMenu.new(self) do
       add :command, :label => 'Quit', :command => proc{gui.root.destroy}
     end
-    advanced = TkMenu.new(p) do |p|
-      m = TkMenu.new(p) do |p|
+    advanced = TkMenu.new(self) do
+      m = TkMenu.new(self) do
         add :command, :label => 'Short Name', :command => proc{gui.name_window(:short)}
         add :command, :label => 'Long Name', :command => proc{gui.name_window(:long)}
       end
@@ -32,22 +32,22 @@ gui.root = TkRoot.new do |p|
     add :cascade, :menu => advanced, :label => 'Advanced'
   end
 
-  Tk::Tile::Frame.new(p) do |p|
+  Tk::Tile::Frame.new(self) do
     pack('side' => 'top', fill: 'both', expand: true)
-    Tk::Tile::LabelFrame.new(p) do |p|
+    Tk::Tile::LabelFrame.new(self) do
       text 'eDMX devices'
       borderwidth 1
       pack('side' => 'left', fill: 'both', expand: true)
-      Tk::Tile::Frame.new(p) do |p|
+      Tk::Tile::Frame.new(self) do
         pack('side' => 'top', fill: 'both', expand: true)
-        gui.devices = Tk::Tile::Treeview.new(p) do |p|
-          p['columns'] = 'name'
-          p.heading_configure('#0', text: 'IP Address')
-          p.heading_configure(:name, text: 'Name')
+        gui.devices = Tk::Tile::Treeview.new(self) do
+          columns 'name'
+          heading_configure('#0', text: 'IP Address')
+          heading_configure(:name, text: 'Name')
           selectmode :browse
           pack(side: 'left', fill: 'both', expand: true)
         end
-        Tk::Tile::Scrollbar.new(p) do |scroll|
+        Tk::Tile::Scrollbar.new(self) do
           pack(side: 'right', fill: 'y')
           command do |*idx|
             gui.devices.yview(*idx)
@@ -57,7 +57,7 @@ gui.root = TkRoot.new do |p|
           }
         end
       end
-      Tk::Tile::Button.new(p) do
+      Tk::Tile::Button.new(self) do
         text 'Search For Device'
         pack(fill: 'both', expand: true)
         command proc {
@@ -67,93 +67,93 @@ gui.root = TkRoot.new do |p|
       end
     end
 
-    gui.tabs = Tk::Tile::Notebook.new(p) do |p|
+    gui.tabs = Tk::Tile::Notebook.new(self) do
       pack('side' => 'left', fill: 'both', expand: true)
-      network = Tk::Tile::Frame.new(p) do |p|
+      network = Tk::Tile::Frame.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
-        Tk::Tile::Frame.new(p) do |p|
+        Tk::Tile::Frame.new(self) do
           pack('side' => 'top', fill: 'both', expand: true)
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'MAC Address'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            gui.mac = Tk::Tile::Label.new(p) do
+            gui.mac = Tk::Tile::Label.new(self) do
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Device IP Address'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            gui.ip = Tk::Tile::Label.new(p) do
+            gui.ip = Tk::Tile::Label.new(self) do
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
         end
-        Tk::Tile::Frame.new(p) do |p|
+        Tk::Tile::Frame.new(self) do
           pack('side' => 'top', fill: 'both', expand: true)
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Network Settings'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            Tk::Tile::Frame.new(p) do |p|
+            Tk::Tile::Frame.new(self) do
               pack('side' => 'top', fill: 'both', expand: true)
-              Tk::Tile::Label.new(p) do
+              Tk::Tile::Label.new(self) do
                 text 'Ip Address'
                 pack('side' => 'left', fill: 'both', expand: true)
               end
-              gui.setting_items << Tk::Tile::Entry.new(p) do
+              gui.setting_items << Tk::Tile::Entry.new(self) do
                 textvariable gui.new_ip = TkVariable.new
                 pack('side' => 'left', fill: 'both', expand: true)
               end
             end
-            Tk::Tile::Frame.new(p) do |p|
+            Tk::Tile::Frame.new(self) do
               pack('side' => 'top', fill: 'both', expand: true)
-              Tk::Tile::Label.new(p) do
+              Tk::Tile::Label.new(self) do
                 text 'Subnet Mask'
                 pack('side' => 'left', fill: 'both', expand: true)
               end
-              gui.setting_items << Tk::Tile::Entry.new(p) do
+              gui.setting_items << Tk::Tile::Entry.new(self) do
                 textvariable gui.new_netmask = TkVariable.new
                 pack('side' => 'left', fill: 'both', expand: true)
               end
             end
-            Tk::Tile::Frame.new(p) do |p|
+            Tk::Tile::Frame.new(self) do
               pack('side' => 'top', fill: 'both', expand: true)
-              Tk::Tile::Label.new(p) do
+              Tk::Tile::Label.new(self) do
                 text 'Default Gateway'
                 pack('side' => 'left', fill: 'both', expand: true)
               end
-              gui.setting_items << Tk::Tile::Entry.new(p) do
+              gui.setting_items << Tk::Tile::Entry.new(self) do
                 textvariable gui.new_gateway = TkVariable.new
                 pack('side' => 'left', fill: 'both', expand: true)
               end
             end
           end
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Network Mode'
             gui.net_mode = TkVariable.new
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            gui.setting_items << Tk::Tile::RadioButton.new(p) do
+            gui.setting_items << Tk::Tile::RadioButton.new(self) do
               text '2.X.Y.Z'
               variable gui.net_mode
               value '1'
               pack('side' => 'top', 'fill' => 'x')
             end
-            gui.setting_items << Tk::Tile::RadioButton.new(p) do
+            gui.setting_items << Tk::Tile::RadioButton.new(self) do
               text '10.X.Y.Z'
               variable gui.net_mode
               value '2'
               pack('side' => 'top', 'fill' => 'x')
             end
-            gui.setting_items << Tk::Tile::RadioButton.new(p) do
+            gui.setting_items << Tk::Tile::RadioButton.new(self) do
               text 'Custom IP'
               variable gui.net_mode
               value '0'
               pack('side' => 'top', 'fill' => 'x')
             end
-            gui.setting_items << Tk::Tile::RadioButton.new(p) do
+            gui.setting_items << Tk::Tile::RadioButton.new(self) do
               text 'DHCP'
               variable gui.net_mode
               value 'dhcp'
@@ -161,44 +161,44 @@ gui.root = TkRoot.new do |p|
             end
           end
         end
-        Tk::Tile::Frame.new(p) do |p|
+        Tk::Tile::Frame.new(self) do
           pack('side' => 'top', fill: 'both', expand: true)
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Hardware Information'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            Tk::Tile::LabelFrame.new(p) do |p|
+            Tk::Tile::LabelFrame.new(self) do
               borderwidth 0
               pack('side' => 'top', fill: 'both', expand: true)
-              Tk::Tile::Label.new(p) do
+              Tk::Tile::Label.new(self) do
                 text 'Firmware Version'
                 pack('side' => 'left', fill: 'both', expand: true)
               end
-              gui.firmware = Tk::Tile::Label.new(p) do
+              gui.firmware = Tk::Tile::Label.new(self) do
                 pack('side' => 'left', fill: 'both', expand: true)
               end
             end
-            Tk::Tile::LabelFrame.new(p) do |p|
+            Tk::Tile::LabelFrame.new(self) do
               borderwidth 0
               pack('side' => 'top', fill: 'both', expand: true)
-              Tk::Tile::Label.new(p) do
+              Tk::Tile::Label.new(self) do
                 text 'Device'
                 pack('side' => 'left', fill: 'both', expand: true)
               end
-              gui.device_name = Tk::Tile::Label.new(p) do
+              gui.device_name = Tk::Tile::Label.new(self) do
                 pack('side' => 'left', fill: 'both', expand: true)
               end
             end
-            gui.name = Tk::Tile::Label.new(p) do
+            gui.name = Tk::Tile::Label.new(self) do
               wraplength 200
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Commands'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            gui.setting_items << Tk::Tile::Button.new(p) do
+            gui.setting_items << Tk::Tile::Button.new(self) do
               text 'Update Network Settings'
               command proc {
                 packet = Settings.new
@@ -215,24 +215,24 @@ gui.root = TkRoot.new do |p|
               }
               pack(fill: 'both', expand: true)
             end
-            gui.setting_items << Tk::Tile::Button.new(p) do
+            gui.setting_items << Tk::Tile::Button.new(self) do
               text 'Firmware Update'
               pack(fill: 'both', expand: true)
             end
           end
         end
-        Tk::Tile::Frame.new(p) do |p|
+        Tk::Tile::Frame.new(self) do
           pack('side' => 'top', fill: 'both', expand: true)
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Network Adapter IP Address'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            gui.adapter_ip = Tk::Tile::Combobox.new(p) do
+            gui.adapter_ip = Tk::Tile::Combobox.new(self) do
               values local_ips.map{|a| a.addr.ip_address}
               pack('side' => 'left', fill: 'both', expand: true)
               state :readonly
               set artnet.local_ip
-              bind("<ComboboxSelected>") do |*l|
+              bind("<ComboboxSelected>") do
                 gui.adapter_ip.selection_clear
                 gui.adapter_mask.text = gui.artnet.netmask
                 gui.reset
@@ -240,33 +240,33 @@ gui.root = TkRoot.new do |p|
               end
             end
           end
-          Tk::Tile::LabelFrame.new(p) do |p|
+          Tk::Tile::LabelFrame.new(self) do
             text 'Network Adapter Subnet Mask'
             borderwidth 1
             pack('side' => 'left', fill: 'both', expand: true)
-            gui.adapter_mask = Tk::Tile::Label.new(p) do
+            gui.adapter_mask = Tk::Tile::Label.new(self) do
               text artnet.netmask
               pack('side' => 'left', fill: 'both', expand: true)
             end
           end
         end
       end
-      p.add network, text: 'Network'
+      add network, text: 'Network'
     end
   end
-  Tk::Tile::LabelFrame.new(p) do |p|
+  Tk::Tile::LabelFrame.new(self) do
     text 'Messages'
     borderwidth 1
     pack('side' => 'bottom', fill: 'both', expand: true)
-    gui.msgs = Tk::Tile::Treeview.new(p) do |p|
+    gui.msgs = Tk::Tile::Treeview.new(self) do
       pack(side: 'left', fill: 'y', expand: true)
-      p['columns'] = 'type source message'
-      p.heading_configure('#0', text: 'Time')
-      p.heading_configure(:type, text: 'Type')
-      p.heading_configure(:source, text: 'Source')
-      p.heading_configure(:message, text: 'ArtNet Message')
+      columns 'type source message'
+      heading_configure('#0', text: 'Time')
+      heading_configure(:type, text: 'Type')
+      heading_configure(:source, text: 'Source')
+      heading_configure(:message, text: 'ArtNet Message')
     end
-    Tk::Tile::Scrollbar.new(p) do |scroll|
+    Tk::Tile::Scrollbar.new(self) do
       pack(side: 'right', fill: 'y')
       command do |*idx|
         gui.msgs.yview(*idx)
@@ -302,22 +302,22 @@ def gui.name_window(type)
   new_name = self.new_name
   new_name.value = type == :short ? node.shortname : node.longname
   gui = self
-  win = Tk::Tile::Toplevel.new(root) do |p|
+  win = TkToplevel.new(root) do
     title 'Edit Art-Net Node Name'
     set_focus
     grab
     transient(root)
-    Tk::Tile::Label.new(p) do
+    Tk::Tile::Label.new(self) do
       text type == :short ? 'Short Name (17 character max)' : 'Long Name (63 character max)'
       pack('side' => 'top', fill: 'both', expand: true)
     end
-    Tk::Tile::Entry.new(p) do
+    Tk::Tile::Entry.new(self) do
       textvariable new_name
       pack('side' => 'top', fill: 'both', expand: true)
     end
-    Tk::Tile::Frame.new(p) do |p|
+    Tk::Tile::Frame.new(self) do
       pack('side' => 'top', fill: 'both', expand: true)
-      Tk::Tile::Button.new(p) do
+      Tk::Tile::Button.new(self) do
         text 'OK'
         command proc {
           packet = ArtNet::Packet::Address.new
@@ -333,7 +333,7 @@ def gui.name_window(type)
         }
         pack(side: 'left', fill: 'both', expand: true)
       end
-      Tk::Tile::Button.new(p) do
+      Tk::Tile::Button.new(self) do
         text 'Cancel'
         command proc {win.destroy}
         pack(side: 'left', fill: 'both', expand: true)
@@ -345,18 +345,18 @@ end
 def gui.port_tab(port)
   gui = self
   vars = OpenStruct.new
-  frame = Tk::Tile::Frame.new(tabs) do |p|
-    Tk::Tile::LabelFrame.new(p) do |p|
+  frame = Tk::Tile::Frame.new(tabs) do
+    Tk::Tile::LabelFrame.new(self) do
       text 'ArtNet Settings'
       borderwidth 1
       pack('side' => 'top', fill: 'both', expand: true)
-      Tk::Tile::Frame.new(p) do |p|
+      Tk::Tile::Frame.new(self) do
         pack('side' => 'top', fill: 'both', expand: true)
-        Tk::Tile::Label.new(p) do
+        Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text 'Update Rate'
         end
-        scale = Tk::Tile::Scale.new(p) do
+        scale = Tk::Tile::Scale.new(self) do
           pack('side' => 'left')
           orient 'horizontal'
           length 200
@@ -364,7 +364,7 @@ def gui.port_tab(port)
           to 40
           variable vars.update_rate = TkVariable.new(port.update_rate)
         end
-        value = Tk::Tile::Label.new(p) do
+        value = Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text port.update_rate.to_s + 'Hz'
         end
@@ -372,13 +372,13 @@ def gui.port_tab(port)
           value.text v.to_i.to_s + 'Hz'
         }
       end
-      Tk::Tile::Frame.new(p) do |p|
+      Tk::Tile::Frame.new(self) do
         pack('side' => 'top', fill: 'both', expand: true)
-        Tk::Tile::Label.new(p) do
+        Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text 'Broadcast Threshold'
         end
-        scale = Tk::Tile::Scale.new(p) do
+        scale = Tk::Tile::Scale.new(self) do
           pack('side' => 'left')
           orient 'horizontal'
           length 200
@@ -386,7 +386,7 @@ def gui.port_tab(port)
           to 20
           set port.broadcast_threshold
         end
-        value = Tk::Tile::Label.new(p) do
+        value = Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text port.broadcast_threshold.to_s
         end
@@ -395,26 +395,26 @@ def gui.port_tab(port)
         }
       end
     end
-    Tk::Tile::Frame.new(p) do |p|
+    Tk::Tile::Frame.new(self) do
       pack('side' => 'top', fill: 'both', expand: true)
-      Tk::Tile::LabelFrame.new(p) do |p|
+      Tk::Tile::LabelFrame.new(self) do
         text 'Merge Mode'
         borderwidth 1
         pack('side' => 'left', fill: 'both', expand: true)
         vars.merge_mode = TkVariable.new port.merge_mode
-        Tk::Tile::RadioButton.new(p) do
+        Tk::Tile::RadioButton.new(self) do
           text 'Highest Takes Priority (HTP)'
           variable vars.merge_mode
           value :htp
           pack('side' => 'top', 'fill' => 'x')
         end
-        Tk::Tile::RadioButton.new(p) do
+        Tk::Tile::RadioButton.new(self) do
           text 'Latest Takes Priority (LTP)'
           variable vars.merge_mode
           value :ltp
           pack('side' => 'top', 'fill' => 'x')
         end
-        Tk::Tile::CheckButton.new(p) do
+        Tk::Tile::CheckButton.new(self) do
           text 'Timeout all sources'
           onvalue true
           offvalue false
@@ -422,24 +422,24 @@ def gui.port_tab(port)
           pack('side' => 'top', 'fill' => 'x')
         end
       end
-      Tk::Tile::LabelFrame.new(p) do |p|
+      Tk::Tile::LabelFrame.new(self) do
         text 'Operation Mode'
         borderwidth 1
         pack('side' => 'left', fill: 'both', expand: true)
         vars.operation_mode = TkVariable.new(port.operation_mode)
-        Tk::Tile::RadioButton.new(p) do
+        Tk::Tile::RadioButton.new(self) do
           text 'DMX In Art-Net'
           variable vars.operation_mode
           value :artnet
           pack('side' => 'top', 'fill' => 'x')
         end
-        Tk::Tile::RadioButton.new(p) do
+        Tk::Tile::RadioButton.new(self) do
           text 'DMX In sACN'
           variable vars.operation_mode
           value :sacn
           pack('side' => 'top', 'fill' => 'x')
         end
-        Tk::Tile::RadioButton.new(p) do
+        Tk::Tile::RadioButton.new(self) do
           text 'DMX Out'
           variable vars.operation_mode
           value :dmx
@@ -447,17 +447,17 @@ def gui.port_tab(port)
         end
       end
     end
-    Tk::Tile::LabelFrame.new(p) do |p|
+    Tk::Tile::LabelFrame.new(self) do
       text 'RDM Settings'
       borderwidth 1
       pack('side' => 'top', fill: 'both', expand: true)
-      Tk::Tile::Frame.new(p) do |p|
+      Tk::Tile::Frame.new(self) do
         pack('side' => 'top', fill: 'both', expand: true)
-        Tk::Tile::Label.new(p) do
+        Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text 'Discovery Period'
         end
-        scale = Tk::Tile::Scale.new(p) do
+        scale = Tk::Tile::Scale.new(self) do
           pack('side' => 'left')
           orient 'horizontal'
           length 200
@@ -465,7 +465,7 @@ def gui.port_tab(port)
           to 600
           variable vars.rdm_discovery = TkVariable.new(port.rdm_discovery)
         end
-        value = Tk::Tile::Label.new(p) do
+        value = Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text port.rdm_discovery.to_s + 's'
         end
@@ -473,13 +473,13 @@ def gui.port_tab(port)
           value.text v.to_i.to_s + 's'
         }
       end
-      Tk::Tile::Frame.new(p) do |p|
+      Tk::Tile::Frame.new(self) do
         pack('side' => 'top', fill: 'both', expand: true)
-        Tk::Tile::Label.new(p) do
+        Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text 'Packet Spacing'
         end
-        scale = Tk::Tile::Scale.new(p) do
+        scale = Tk::Tile::Scale.new(self) do
           pack('side' => 'left')
           orient 'horizontal'
           length 200
@@ -487,7 +487,7 @@ def gui.port_tab(port)
           to 40
           variable vars.rdm_spacing = TkVariable.new(port.rdm_spacing)
         end
-        value = Tk::Tile::Label.new(p) do
+        value = Tk::Tile::Label.new(self) do
           pack('side' => 'left', fill: 'both', expand: true)
           text port.rdm_spacing.to_s + '1/20s'
         end
@@ -496,16 +496,16 @@ def gui.port_tab(port)
         }
       end
     end
-    Tk::Tile::Frame.new(p) do |p|
+    Tk::Tile::Frame.new(self) do
       pack('side' => 'top', fill: 'both', expand: true)
-      Tk::Tile::CheckButton.new(p) do
+      Tk::Tile::CheckButton.new(self) do
         text 'Recall DMX snapshot at startup'
         onvalue true
         offvalue false
         variable vars.recall_dmx = TkVariable.new(port.recall_dmx?)
         pack('side' => 'left', 'fill' => 'x')
       end
-      Tk::Tile::Button.new(p) do
+      Tk::Tile::Button.new(self) do
         text 'Snapshot DMX'
         command proc {
           packet = Snapshot.new
@@ -515,33 +515,33 @@ def gui.port_tab(port)
         pack(side: 'left', fill: 'both', expand: true)
       end
     end
-    Tk::Tile::Frame.new(p) do |p|
+    Tk::Tile::Frame.new(self) do
       pack('side' => 'top', fill: 'both', expand: true)
-      Tk::Tile::Button.new(p) do
+      Tk::Tile::Button.new(self) do
         text 'Update'
         command proc {
           packet = Settings.new
-          packet.ports = gui.ports.map do |port|
-            translate_port(port)
+          packet.ports = gui.ports.map do |p|
+            translate_port(p)
           end
           packet.update! :ports
           gui.artnet.transmit packet, gui.node
         }
         pack(side: 'left', fill: 'both', expand: true)
       end
-      Tk::Tile::LabelFrame.new(p) do |p|
+      Tk::Tile::LabelFrame.new(self) do
         text 'Universe'
         borderwidth 1
         pack('side' => 'left', fill: 'both', expand: true)
-        Tk::Tile::Entry.new(p) do
+        Tk::Tile::Entry.new(self) do
           textvariable vars.universe = TkVariable.new
           pack('side' => 'left', fill: 'both', expand: true)
         end
-        Tk::Tile::LabelFrame.new(p) do |p|
+        Tk::Tile::LabelFrame.new(self) do
           text 'Art-Net Address'
           borderwidth 0
           pack('side' => 'left', fill: 'both', expand: true)
-          Tk::Tile::Label.new(p) do
+          Tk::Tile::Label.new(self) do
             vars.universe.trace :w, proc{|v|
               text '%04X' % (v.value.to_i - 1)
             }
