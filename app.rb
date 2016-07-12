@@ -47,15 +47,10 @@ gui.root = TkRoot.new do
           selectmode :browse
           pack(side: 'left', fill: 'both', expand: true)
         end
-        Tk::Tile::Scrollbar.new(self) do
+        bar = Tk::Tile::Scrollbar.new(self) do
           pack(side: 'right', fill: 'y')
-          command do |*idx|
-            gui.devices.yview(*idx)
-          end
-          gui.devices.yscroll proc { |*idx|
-            set(*idx)
-          }
         end
+        gui.devices.yscrollbar bar
       end
       Tk::Tile::Button.new(self) do
         text 'Search For Device'
@@ -266,15 +261,10 @@ gui.root = TkRoot.new do
       heading_configure(:source, text: 'Source')
       heading_configure(:message, text: 'ArtNet Message')
     end
-    Tk::Tile::Scrollbar.new(self) do
+    bar = Tk::Tile::Scrollbar.new(self) do
       pack(side: 'right', fill: 'y')
-      command do |*idx|
-        gui.msgs.yview(*idx)
-      end
-      gui.msgs.yscroll proc { |*idx|
-        set(*idx)
-      }
     end
+    gui.msgs.yscrollbar bar
   end
 end
 
