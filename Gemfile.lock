@@ -1,0 +1,18 @@
+GIT
+  remote: https://github.com/tristanharris/ruby-artnet.git
+  revision: 34bfb9f8045429ba1253fc7cb916b75de99a05c8
+  specs:
+    ruby-artnet (0.0.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  ruby-artnet!
+
+BUNDLED WITH
+   1.16.5
